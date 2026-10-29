@@ -17,22 +17,27 @@ document.addEventListener('DOMContentLoaded', () => {
         startX: 100,          // posição do personagem na tela
         gravity: 2800,        // px/s²
         jumpV: 880,           // velocidade inicial do pulo
-        // Curva de velocidade personalizada do nível 1 ao 10:
+        
+        // Curva de velocidade do nível 1 ao 15:
         levelSpeeds: [
-            260,   // Nível 1: Tranquilo (mantido)
-            430,   // Nível 2: Médio (mantido)
-            720,   // Nível 3: Já entra Difícil!
-            760,   // Nível 4: Aumenta um pouco (+40px/s)
-            920,   // Nível 5: Acelera 4x mais! (+160px/s)
-            1080,  // Nível 6: Acelera 4x mais! (+160px/s)
-            1240,  // Nível 7: Acelera 4x mais! (+160px/s)
-            1350,  // Nível 8: Super rápido (+110px/s)
-            1550,  // Nível 9: MODO IMPOSSÍVEL! (+200px/s)
-            1800   // Nível 10: EXTREMAMENTE IMPOSSÍVEL! (+250px/s)
+            360,   // Nível 1
+            430,   // Nível 2
+            720,   // Nível 3
+            760,   // Nível 4
+            920,   // Nível 5
+            1080,  // Nível 6
+            1240,  // Nível 7
+            1350,  // Nível 8
+            1550,  // Nível 9
+            2200,  // Nível 10: IMPOSSÍVEL!
+            2600,  // Nível 11: IMPOSSÍVEL+
+            3000,  // Nível 12: IMPOSSÍVEL++
+            3500,  // Nível 13: EXTREMO!
+            4000,  // Nível 14: VELOCIDADE MÁXIMA!
+            4800   // Nível 15: LIMITE NORMAL!
         ],
-        speedStepAfter: 100,  // Do nível 11 em diante, se alguém sobreviver
-        maxSpeed: 2200,       // Aumentado o limite máximo para não travar a velocidade nos níveis finais
-        speedEase: 3.5,       // Transição mais rápida entre os níveis quando a velocidade sobe
+        maxSpeed: 99999,      // Removido o teto limite para permitir a aceleração tripla
+        speedEase: 5.0,       // Transição instantânea para acompanhar os saltos de velocidade
         levelEvery: 15,       // Segundos para subir de nível
         lives: 3,
         invulnTime: 1.5,
@@ -40,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         shellValue: 50,
         distDivisor: 40
     };
-
     const CHARACTERS = [
         { src: 'assets/personagem-1.png', base: 'assets/personagem-1-base.png', run: ['assets/personagem-1-corre1.png', 'assets/personagem-1-corre2.png'], body: 0.50 },
         { src: 'assets/personagem-2.png', base: 'assets/personagem-2-base.png', run: ['assets/personagem-2-corre1.png', 'assets/personagem-2-corre2.png'], body: 0.38 },
