@@ -139,13 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let muted = localStorage.getItem('moana_jump_muted') === '1';
 
     function getCtx() {
-        if (!audioCtx) {
-            const AC = window.AudioContext || window.webkitAudioContext;
-            if (AC) audioCtx = new AC();
-        }
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        return audioCtx;
+    if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
     }
+    // Força a ativação do áudio se estiver suspenso pelo navegador
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
 
     function tone(freq, start, dur, type, vol, endFreq) {
         const ctx = getCtx();
@@ -797,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('moana_jump_player', currentPlayer);
         localStorage.setItem('moana_jump_char', String(selectedChar));
 
-        getCtx();                                  // libera o áudio (precisa de um clique/tecla)
+        getCtx(); // 👈 Garante que ativa o som no clique do botão
         startModal.classList.remove('active');
         startGame();
     });
