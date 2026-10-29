@@ -1,3 +1,7 @@
+/* =========================================================
+   MOANA JUMP - Estilos
+   ========================================================= */
+
 /* Reset e Estilos Globais */
 * {
     margin: 0;
@@ -6,301 +10,676 @@
 }
 
 body {
-    background: #111422;
+    background: #0b2536;
     font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
     color: #ffffff;
-    min-height: 100vh;
+    width: 100vw;       /* 👈 DIZ: "Ocupe 100% da LARGURA da tela toda!" */
+    height: 100vh;      /* 👈 DIZ: "Ocupe 100% da ALTURA da tela toda!" */
+    margin: 0;          /* 👈 DIZ: "Tire qualquer espacinho de sobra nas bordas!" */
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-x: hidden;
+    overflow: hidden;   /* 👈 DIZ: "Esconda barrinhas de rolagem chatas!" */
     user-select: none;
+    -webkit-user-select: none;
+}
+img {
+    image-rendering: pixelated;
 }
 
 .game-container {
     width: 100%;
-    max-width: 900px;
-    padding: 10px;
+    height: 100vh;     /* 👈 DIZ: "A caixinha do jogo vai ter o tamanho da tela!" */
+    max-width: none;   /* 👈 DIZ: "Tire o freio de 900px, agora pode esticar tudo!" */
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-/* Barra Superior (HUD) */
+/* =========================================================
+   HUD
+   ========================================================= */
+/* =========================================================
+   HUD - CABEÇALHO (Estilo Pixel Art Praiano)
+   ========================================================= */
 .hud-bar {
     width: 100%;
-    background: linear-gradient(180deg, #2b3044 0%, #1a1e2d 100%);
-    border: 3px solid #ffcc00;
-    border-bottom: none;
-    border-radius: 12px 12px 0 0;
+    background: linear-gradient(180deg, #677ace 0%, #220b78 100%);
+    border: none;
+    border-bottom: 4px solid #009dff;
+    border-radius: 0;
     padding: 12px 24px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    gap: 8px 16px;
+    box-shadow: 0 4px 12px rgba(10, 50, 87, 0.5);
+    z-index: 50;
 }
-
-.player-info, .score-info {
+.hud-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 70px;
 }
 
 .label {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 11px;
-    color: #ffcc00;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #02070e;
     letter-spacing: 1px;
 }
 
 .value {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 14px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
     color: #ffffff;
     text-shadow: 2px 2px #000;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
 }
 
-/* Tabuleiro do Jogo */
+#hud-player-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    line-height: 24px;
+}
+
+.hud-icon {
+    height: 20px;
+    width: auto;
+}
+
+.hearts {
+    gap: 4px;
+}
+
+.hearts img {
+    height: 22px;
+    width: auto;
+}
+
+.hearts img.pulse {
+    animation: heart-pulse 0.5s ease-out;
+}
+
+@keyframes heart-pulse {
+    0% { transform: scale(1.7); }
+    100% { transform: scale(1); }
+}
+
+/* =========================================================
+   TABULEIRO
+   ========================================================= */
 .game-board {
     width: 100%;
-    height: 480px;
-    border-left: 4px solid #333;
-    border-right: 4px solid #333;
-    border-bottom: 20px solid rgb(35, 160, 35);
-    border-radius: 0 0 12px 12px;
+    flex: 1;
+    height: auto;
+    border: none;
+    border-radius: 0;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(#87ceeb, #e0f6ff);
+    background: #6fa3ff url('../assets/fundo.png') center bottom / cover no-repeat;
+    image-rendering: pixelated;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     cursor: pointer;
+    touch-action: manipulation;
+}
+.game-board.hit {
+    animation: hit-shake 0.4s ease-out;
 }
 
-/* Elementos do Jogo */
-.pipe {
-    position: absolute;
-    bottom: 0;
-    width: 80px;
-    right: -80px;
+@keyframes hit-shake {
+    0%   { box-shadow: inset 0 0 90px 30px rgba(255, 30, 30, 0.65); transform: translateX(0); }
+    20%  { transform: translateX(-6px); }
+    40%  { transform: translateX(6px); }
+    60%  { transform: translateX(-4px); }
+    80%  { transform: translateX(3px); }
+    100% { box-shadow: inset 0 0 0 0 rgba(255, 30, 30, 0); transform: translateX(0); }
 }
 
-.mario {
-    width: 150px;
+.layer {
     position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.layer-world { z-index: 5; }
+
+/* Nuvens que aparecem durante o jogo */
+.cloud {
+    position: absolute;
+    left: 0;
+    will-change: transform;
+    image-rendering: auto;
+    opacity: 0.96;
+}
+
+/* Areia que passa embaixo (sensação de velocidade) */
+.sand-strip {
+    --off: 0px;
+    position: absolute;
+    left: 0;
+    right: 0;
     bottom: 0;
-    left: 20px;
+    height: 36px;
+    z-index: 3;
+    pointer-events: none;
+    background-image:
+        linear-gradient(90deg, rgba(139, 94, 40, 0.5) 0 18px, transparent 18px),
+        linear-gradient(90deg, rgba(139, 94, 40, 0.38) 0 10px, transparent 10px),
+        linear-gradient(90deg, rgba(255, 245, 205, 0.55) 0 8px, transparent 8px);
+    background-size: 130px 4px, 82px 4px, 64px 4px;
+    background-repeat: repeat-x;
+    background-position:
+        var(--off) 8px,
+        calc(var(--off) * 1.3 + 30px) 20px,
+        calc(var(--off) * 1.1 + 12px) 28px;
+}
+
+/* Jogador */
+.player {
+    position: absolute;
+    left: 0;
+    bottom: 38px;
     z-index: 10;
+    will-change: transform;
 }
 
-.clouds {
+.player img {
+    display: block;
+    height: 129px;
+    width: auto;
+}
+
+/* Botões de toque (aparecem em celular/tablet) */
+.touch-controls {
+    display: none;
+    width: 100%;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.touch-controls button {
+    flex: 1;
+    height: 56px;
+    border: 3px solid #000;
+    border-radius: 10px;
+    background: #ffd23f;
+    color: #5a2d00;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    touch-action: none;
+}
+
+.touch-controls button[data-key="jump"] {
+    flex: 2;
+    background: #f26a1b;
+    color: #fff;
+    font-size: 13px;
+}
+
+.touch-controls button:active {
+    transform: translateY(2px);
+    filter: brightness(0.9);
+}
+
+@media (pointer: coarse), (max-width: 700px) {
+    .touch-controls { display: flex; }
+}
+
+/* Fantasma (aparece quando as vidas acabam) */
+.ghost {
     position: absolute;
-    width: 550px;
-    top: 30px;
-    right: -550px;
+    left: 0;
+    bottom: 38px;
+    height: 124px;
+    width: auto;
+    z-index: 12;
+    display: none;
+    pointer-events: none;
+}
+
+.ghost.show {
+    display: block;
+    animation:
+        ghost-rise 1.8s ease-out forwards,
+        ghost-sway 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes ghost-rise {
+    0%   { translate: 0 0; opacity: 0; }
+    15%  { opacity: 1; }
+    100% { translate: 0 -150px; opacity: 0.95; }
+}
+
+@keyframes ghost-sway {
+    from { rotate: -6deg; }
+    to   { rotate: 6deg; }
 }
 
 /* Dica de pulo na tela */
 .jump-tip {
     position: absolute;
-    bottom: 40px;
+    bottom: 6px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', monospace;
     font-size: 10px;
-    color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    white-space: nowrap;
+    z-index: 20;
     pointer-events: none;
     transition: opacity 0.3s;
 }
 
-/* Animações ativas durante o jogo */
-.game-board.running .pipe {
-    animation: pipe-animation 1.6s infinite linear;
+/* Aviso de nível */
+.level-banner {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 22px;
+    color: #ffd23f;
+    text-shadow: 3px 3px #000;
+    opacity: 0;
+    z-index: 20;
+    pointer-events: none;
+    white-space: nowrap;
 }
 
-.game-board.running .clouds {
-    animation: clouds-animation 18s infinite linear;
+.level-banner.show {
+    animation: banner-pop 1.7s ease-out;
 }
 
-.jump {
-    animation: jump-animation 500ms ease-out;
+@keyframes banner-pop {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.6); }
+    15%  { opacity: 1; transform: translateX(-50%) scale(1.1); }
+    25%  { transform: translateX(-50%) scale(1); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-14px); }
 }
 
-@keyframes pipe-animation {
-    from {
-        right: -80px;
-    }
-    to {
-        right: 100%;
-    }
+/* Botão de som */
+.mute-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    border: 3px solid #000;
+    background: rgba(255, 255, 255, 0.85);
+    color: #0a2f3b;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 25;
+    border-radius: 6px;
 }
 
-@keyframes jump-animation {
-    0% {
-        bottom: 0;
-    }
-    40% {
-        bottom: 180px;
-    }
-    50% {
-        bottom: 180px;
-    }
-    100% {
-        bottom: 0;
-    }
+.mute-btn.muted {
+    background: rgba(255, 120, 120, 0.9);
+    text-decoration: line-through;
 }
 
-@keyframes clouds-animation {
-    from {
-        right: -550px;
-    }
-    to {
-        right: 100%;
-    }
-}
-
-/* Modais / Telas Sobrepostas */
-.modal-overlay {
-    position: fixed;
-    top: 0;
+/* Texto flutuante (+10, +50) */
+.pop {
+    position: absolute;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(10, 12, 22, 0.85);
-    backdrop-filter: blur(8px);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    z-index: 15;
+    pointer-events: none;
+    animation: pop-up 0.75s ease-out forwards;
+}
+
+.pop.shell { color: #ffb3c8; }
+
+@keyframes pop-up {
+    from { translate: 0 0; opacity: 1; }
+    to   { translate: 0 -40px; opacity: 0; }
+}
+
+.obstacle, .item {
+    position: absolute;
+    left: 0;
+    will-change: transform;
+}
+
+.item {
+    animation: item-float 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes item-float {
+    from { margin-bottom: 0; }
+    to   { margin-bottom: 4px; }
+}
+
+/* =========================================================
+   TELA DE INÍCIO (estilo Mario clássico)
+   ========================================================= */
+.title-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #5c94fc;
     display: none;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.title-screen.active {
+    display: flex;
+}
+
+.ts-hud {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 22px 0;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    z-index: 3;
+}
+
+.ts-hud span {
+    letter-spacing: 1px;
+}
+
+.ts-hud b {
+    font-weight: normal;
+}
+
+.ts-cloud {
+    position: absolute;
+    width: 150px;
+    image-rendering: auto;
+    z-index: 1;
+    left: 0;
+    animation: ts-drift 70s linear infinite;
+    opacity: 0.97;
+}
+
+.ts-cloud.c1 { top: 90px;  animation-duration: 80s; animation-delay: -10s; }
+.ts-cloud.c2 { top: 230px; width: 110px; animation-duration: 58s; animation-delay: -35s; }
+.ts-cloud.c3 { top: 150px; width: 190px; animation-duration: 105s; animation-delay: -70s; }
+
+@keyframes ts-drift {
+    from { transform: translateX(-220px); }
+    to   { transform: translateX(105vw); }
+}
+
+.ts-content {
+    flex: 1;
+    width: 100%;
+    max-width: 640px;
+    padding: 12px 16px 96px;
+    text-align: center;
+    z-index: 4;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 100;
-    padding: 20px;
 }
 
-.modal-overlay.active {
+.ts-title {
     display: flex;
-    animation: fadeIn 0.3s ease-in-out;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.1;
+    margin-bottom: 14px;
 }
 
-.modal-card {
-    background: #1f2438;
-    border: 4px solid #e52521;
-    border-radius: 16px;
-    padding: 30px;
-    width: 100%;
-    max-width: 480px;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(229, 37, 33, 0.4), 0 15px 40px rgba(0, 0, 0, 0.7);
+.ts-title span {
+    --o: 4px;
+    text-shadow:
+        calc(var(--o) * -1) calc(var(--o) * -1) 0 #000,
+        var(--o) calc(var(--o) * -1) 0 #000,
+        calc(var(--o) * -1) var(--o) 0 #000,
+        var(--o) var(--o) 0 #000,
+        0 calc(var(--o) * -1) 0 #000,
+        0 var(--o) 0 #000,
+        calc(var(--o) * -1) 0 0 #000,
+        var(--o) 0 0 #000,
+        8px 10px 0 #000;
 }
 
-.modal-header {
-    margin-bottom: 25px;
+.ts-title .t1 {
+    font-size: 54px;
+    color: #f26a1b;
 }
 
-.game-title {
-    font-family: 'Press Start 2P', cursive;
-    color: #ffce00;
-    font-size: 20px;
-    line-height: 1.5;
-    text-shadow: 3px 3px #e52521, 6px 6px #000000;
-    margin-bottom: 12px;
+.ts-title .t2 {
+    font-size: 40px;
+    color: #ffd23f;
 }
 
-.game-subtitle {
-    font-size: 13px;
-    color: #a4b1cd;
+.ts-sub {
+    font-size: 9px;
+    line-height: 1.9;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 18px;
+    max-width: 440px;
 }
 
 /* Formulário de Início */
 .start-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
 }
 
-.input-group label {
-    font-family: 'Press Start 2P', cursive;
+.input-group label,
+.char-label {
     font-size: 11px;
-    color: #ffffff;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    letter-spacing: 1px;
+}
+
+.char-label {
+    margin-top: 6px;
 }
 
 .input-group input {
     width: 100%;
-    padding: 14px 18px;
-    border-radius: 8px;
-    border: 2px solid #3b4468;
-    background: #121524;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    outline: none;
-    transition: all 0.25s;
+    max-width: 360px;
+    padding: 12px 14px;
+    border: 4px solid #fff;
+    outline: 4px solid #000;
+    background: #000;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    text-align: center;
+    caret-color: #ffd23f;
+}
+
+.input-group input::placeholder {
+    color: #6b6b6b;
 }
 
 .input-group input:focus {
-    border-color: #ffcc00;
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+    border-color: #ffd23f;
 }
 
-/* Botões */
-.modal-actions {
+/* Seleção de personagem (sobre "blocos") */
+.char-select {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.char-card {
+    background: none;
+    border: 0;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    width: 86px;
+    padding: 0;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.char-card img {
+    height: 90px;
+    width: auto;
+    max-width: 86px;
+    object-fit: contain;
+    object-position: bottom;
+    filter: brightness(0.72) saturate(0.85);
+    transition: filter 0.15s, transform 0.15s;
+}
+
+.char-card:hover img {
+    filter: brightness(0.95);
+}
+
+.char-arrow {
+    font-size: 14px;
+    color: #ffd23f;
+    text-shadow: 2px 2px #000;
+    visibility: hidden;
+}
+
+.char-block {
+    width: 66px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #7a3b00;
+    background: #fcbc3c;
+    border: 4px solid #000;
+    box-shadow:
+        inset 4px 4px 0 #ffe08a,
+        inset -4px -4px 0 #c47a0a;
+}
+
+.char-card.selected img {
+    filter: none;
+    animation: char-hop 0.6s ease-in-out infinite alternate;
+}
+
+.char-card.selected .char-arrow {
+    visibility: visible;
+    animation: arrow-bob 0.6s steps(2) infinite;
+}
+
+.char-card.selected .char-block {
+    background: #f26a1b;
+    color: #fff;
+    box-shadow:
+        inset 4px 4px 0 #ff9d5c,
+        inset -4px -4px 0 #a8420a;
+}
+
+.char-card:focus-visible {
+    outline: 3px dashed #fff;
+    outline-offset: 3px;
+}
+
+@keyframes char-hop {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-8px); }
+}
+
+@keyframes arrow-bob {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-4px); }
+}
+
+/* Menu */
+.ts-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
     margin-top: 10px;
 }
 
-.btn {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 8px;
+.menu-btn {
+    background: none;
+    border: 0;
     cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    letter-spacing: 0.5px;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    text-shadow: 2px 2px #000;
+    padding: 6px 12px 6px 4px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.btn-primary {
-    background: linear-gradient(180deg, #e52521 0%, #b81410 100%);
-    color: #ffffff;
-    border-bottom: 4px solid #7a0b08;
+.menu-btn .cursor {
+    visibility: hidden;
+    color: #ffd23f;
+    font-size: 12px;
 }
 
-.btn-primary:hover {
-    background: linear-gradient(180deg, #ff3833 0%, #cf1915 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(229, 37, 33, 0.4);
+.menu-btn:hover,
+.menu-btn:focus-visible,
+.menu-btn.is-default {
+    color: #ffd23f;
+    outline: none;
 }
 
-.btn-primary:active {
-    transform: translateY(2px);
-    border-bottom: 2px solid #7a0b08;
+.menu-btn:hover .cursor,
+.menu-btn:focus-visible .cursor,
+.menu-btn.is-default .cursor {
+    visibility: visible;
+    animation: blink 0.7s steps(1) infinite;
 }
 
-.btn-secondary {
-    background: #2f3752;
-    color: #cbd5e1;
-    border-bottom: 4px solid #1a1e2f;
+@keyframes blink {
+    50% { opacity: 0; }
 }
 
-.btn-secondary:hover {
-    background: #3c4667;
-    color: #ffffff;
-}
-
-/* Status do Laragon */
+/* Status do servidor */
 .server-status {
-    margin-top: 20px;
+    margin-top: 14px;
+    font-family: 'Poppins', sans-serif;
     font-size: 11px;
-    color: #8c97b8;
+    color: #fff;
+    text-shadow: 1px 1px #000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -308,11 +687,12 @@ body {
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #ffcc00;
     display: inline-block;
+    border: 1px solid #000;
 }
 
 .status-dot.online {
@@ -325,48 +705,339 @@ body {
     box-shadow: 0 0 8px #ef4444;
 }
 
+/* Chão em blocos + morros */
+.ts-ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 72px;
+    z-index: 2;
+    background-color: #c84c0c;
+    background-image:
+        linear-gradient(#000 3px, transparent 3px),
+        linear-gradient(90deg, #000 3px, transparent 3px),
+        linear-gradient(135deg, #f89c5c 0 6px, transparent 6px);
+    background-size: 36px 36px, 36px 36px, 36px 36px;
+    border-top: 4px solid #000;
+}
+
+.ts-ground::before,
+.ts-ground::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    background: #00a800;
+    border: 4px solid #000;
+    border-bottom: 0;
+    margin-bottom: 4px;
+}
+
+.ts-ground::before {
+    left: 4%;
+    width: 240px;
+    height: 120px;
+    border-radius: 120px 120px 0 0;
+}
+
+.ts-ground::after {
+    right: 5%;
+    width: 150px;
+    height: 70px;
+    border-radius: 70px 70px 0 0;
+}
+
+
+
+/* =========================================================
+   MODAIS (Game Over & Ranking - Estilo Super Mario 8-Bit)
+   ========================================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    overflow-y: auto;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-card {
+    background: #5c94fc;             /* Azul céu clássico do Mario */
+    border: 4px solid #000;
+    border-radius: 0;                /* Cantos retos estilo pixel art */
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    box-shadow: 8px 8px 0px #000;    /* Sombra em bloco preta 8-bit */
+    position: relative;
+}
+
+/* Título estilo Mario */
+.gameover-title {
+    font-family: 'Press Start 2P', monospace;
+    color: #f26a1b;                  /* Laranja clássico com contorno */
+    font-size: 28px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+    text-shadow:
+        -3px -3px 0 #000,
+         3px -3px 0 #000,
+        -3px  3px 0 #000,
+         3px  3px 0 #000,
+         6px  6px 0 #000;
+}
+
+/* Caixa de Pontuação - Estilo Bloco Amarelo */
+.final-score-box {
+    background: #fcbc3c;
+    border: 4px solid #000;
+    padding: 14px;
+    margin-bottom: 18px;
+    box-shadow:
+        inset 4px 4px 0 #ffe08a,
+        inset -4px -4px 0 #c47a0a,
+        4px 4px 0 #000;
+}
+
+.final-score-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #000;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.final-score-num {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 30px;
+    color: #fff;
+    text-shadow: 3px 3px 0 #000;
+}
+
+.final-stats {
+    margin-top: 8px;
+    font-size: 9px;
+    color: #000;
+    line-height: 1.6;
+}
+
+.save-status {
+    margin-top: 6px;
+    font-size: 9px;
+    font-family: 'Press Start 2P', monospace;
+    color: #000;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+/* Tabela do Ranking em Estilo Bloco / Pixel Art */
+.ranking-container {
+    margin-bottom: 18px;
+}
+
+.ranking-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #ffd23f;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.table-wrapper {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #000;
+    border: 4px solid #fff;
+    outline: 4px solid #000;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    text-align: left;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.ranking-table th {
+    background: #c84c0c;
+    color: #ffd23f;
+    font-size: 8px;
+    padding: 10px 8px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 3px solid #000;
+}
+
+.ranking-table td {
+    padding: 8px;
+    border-bottom: 2px solid #333;
+}
+
+.ranking-table tr.highlight-current {
+    background: #f26a1b !important;
+    color: #ffd23f !important;
+}
+
+/* Botões Estilo Menu de Opções Retro */
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    padding: 14px 16px;
+    border: 4px solid #000;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+}
+
+.btn-primary {
+    background: #f26a1b;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    box-shadow:
+        inset 3px 3px 0 #ff9d5c,
+        inset -3px -3px 0 #a8420a,
+        4px 4px 0 #000;
+}
+
+.btn-primary:hover {
+    background: #ffd23f;
+    color: #000;
+    text-shadow: none;
+    transform: translate(-2px, -2px);
+    box-shadow:
+        inset 3px 3px 0 #ffe08a,
+        inset -3px -3px 0 #c47a0a,
+        6px 6px 0 #000;
+}
+
+.btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.btn-secondary {
+    background: #00a800;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    box-shadow:
+        inset 3px 3px 0 #5cf05c,
+        inset -3px -3px 0 #006000,
+        4px 4px 0 #000;
+}
+
+.btn-secondary:hover {
+    background: #ffd23f;
+    color: #000;
+    text-shadow: none;
+    transform: translate(-2px, -2px);
+    box-shadow:
+        inset 3px 3px 0 #ffe08a,
+        inset -3px -3px 0 #c47a0a,
+        6px 6px 0 #000;
+}
+
+.btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.btn-secondary {
+    background: #20bf6b;
+    color: #fff;
+    box-shadow: 0 5px 0 0 #0b8457, 0 8px 12px rgba(0, 0, 0, 0.4);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.btn-secondary:hover {
+    background: #26de81;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 0 #0b8457, 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+.btn-secondary:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 0 #0b8457;
+}
+
+.btn-secondary {
+    background: #1d5a70;
+    color: #d6eef5;
+    border-bottom: 4px solid #0b2f3d;
+}
+
+.btn-secondary:hover {
+    background: #277590;
+    color: #ffffff;
+}
+
 /* Tela de Game Over & Ranking */
 .gameover-card {
     max-width: 540px;
 }
 
 .gameover-title {
-    font-family: 'Press Start 2P', cursive;
-    color: #e52521;
+    font-family: 'Press Start 2P', monospace;
+    color: #ff6b6b;
     font-size: 26px;
     text-shadow: 3px 3px #000;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .final-score-box {
-    background: #141726;
+    background: #0a2a37;
     border-radius: 8px;
     padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #333d5d;
+    border: 1px solid #2a6a82;
 }
 
 .final-score-label {
     font-size: 12px;
-    color: #94a3b8;
-    margin-bottom: 4px;
+    color: #9cc7d6;
+    margin-bottom: 6px;
 }
 
 .final-score-num {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', monospace;
     font-size: 24px;
     color: #ffcc00;
     text-shadow: 2px 2px #000;
 }
 
+.final-stats {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #cfe8f0;
+}
+
 /* Tabela de Ranking */
 .ranking-container {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .ranking-title {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
     color: #ffcc00;
     margin-bottom: 12px;
     letter-spacing: 0.5px;
@@ -376,15 +1047,15 @@ body {
     max-height: 220px;
     overflow-y: auto;
     border-radius: 8px;
-    background: #121524;
-    border: 1px solid #2b334d;
+    background: #0a2a37;
+    border: 1px solid #2a6a82;
 }
 
 .table-wrapper::-webkit-scrollbar {
     width: 6px;
 }
 .table-wrapper::-webkit-scrollbar-thumb {
-    background: #3b4468;
+    background: #2a6a82;
     border-radius: 4px;
 }
 
@@ -396,9 +1067,9 @@ body {
 }
 
 .ranking-table th {
-    background: #242c44;
+    background: #124a5e;
     color: #ffcc00;
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', monospace;
     font-size: 9px;
     padding: 10px 14px;
     position: sticky;
@@ -408,35 +1079,37 @@ body {
 
 .ranking-table td {
     padding: 8px 14px;
-    border-bottom: 1px solid #1c2236;
+    border-bottom: 1px solid #12404f;
 }
 
 .ranking-table tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .ranking-table tr.highlight-current {
-    background: rgba(255, 204, 0, 0.15) !important;
+    background: rgba(255, 204, 0, 0.18) !important;
     font-weight: 700;
     color: #ffcc00;
 }
 
 .ranking-pos {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', monospace;
     font-size: 10px;
-    width: 40px;
+    width: 80px;
+    white-space: nowrap;
 }
 
 .loading-cell {
     text-align: center;
     padding: 20px !important;
-    color: #8c97b8;
+    color: #9cc7d6;
 }
 
 .save-status {
     margin-top: 8px;
     font-size: 11px;
     color: #10b981;
+    min-height: 16px;
 }
 
 @keyframes fadeIn {
@@ -450,31 +1123,36 @@ body {
     }
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
+/* =========================================================
+   Responsividade
+   ========================================================= */
+@media (max-width: 700px) {
     .game-board {
-        height: 380px;
-    }
-    .mario {
-        width: 100px;
-    }
-    .pipe {
-        width: 60px;
+        height: 400px;
     }
     .hud-bar {
-        padding: 10px 14px;
+        padding: 8px 12px;
     }
     .label {
-        font-size: 9px;
+        font-size: 8px;
     }
     .value {
-        font-size: 11px;
-    }
-    .game-title {
-        font-size: 16px;
-    }
-    .btn {
         font-size: 10px;
-        padding: 12px 14px;
     }
+    .jump-tip {
+        font-size: 8px;
+    }
+    .ts-hud {
+        font-size: 9px;
+        padding: 12px 12px 0;
+    }
+    .ts-title .t1 { font-size: 36px; }
+    .ts-title .t2 { font-size: 28px; }
+    .ts-title span { --o: 3px; }
+    .ts-sub { font-size: 8px; }
+    .char-card { width: 68px; }
+    .char-card img { height: 72px; max-width: 68px; }
+    .char-block { width: 52px; height: 28px; font-size: 11px; }
+    .menu-btn { font-size: 12px; }
+    .btn { font-size: 9px; padding: 12px 14px; }
 }
